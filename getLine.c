@@ -88,7 +88,7 @@ ssize_t get_input(info_t *info)
 }
 
 /**
- * read_buf - read a buffer
+ * read_buf - reads a buffer
  * @info: parameter struct
  * @buf: buffer
  * @i: size
