@@ -1,93 +1,63 @@
-#include "shell.h"
+.\" Manpage for our shell
+.\" Contact cynthiaadesuwaosagie@gmail.com to correct errors or typos.
+.TH shell "15 APR 2019" "0.1" "Our Shell man page"
+.SH NAME
+     command interpreter (shell)
+.SH SYNOPSIS
+ COMMAND [ARGUMENT]
+.SH DESCRIPTION
+The shell is a command that reads lines from either a file or the terminal,
+interprets them, and generally executes other commands.It incorporates many feat
+ures to aid interactive use and has the advantage that the interpretative language 
+is common to both interactive and non-interactive use (shell scripts).  That is, 
+commands can be typed directly to the running shell or can be put into a file and
+the file can be executed directly by the shell.
+The shell interprets the words it reads according to a language, the specificati
+on of which is outside the scope of this man page
+.SH Path Search
+     When locating a command, the shell first looks to see if it has a shell
+     function by that name.  Then it looks for a builtin command by that name.
+     If a builtin command is not found, one of two things happen:
 
-/**
- * get_environ - returns the string array copy of our environ
- * @info: Structure containing potential arguments. Used to maintain
- * constant function prototype.
- * Return: Always 0
- */
-char **get_environ(info_t *info)
-{
-	if (!info->environ || info->env_changed)
-	{
-		info->environ = list_to_strings(info->env);
-		info->env_changed = 0;
-	}
+     1.   Command names containing a slash are simply executed without perform‐
+          ing any searches.
 
-	return (info->environ);
-}
+     2.   The shell searches each entry in PATH in turn for the command.  The
+          value of the PATH variable should be a series of entries separated by
+          colons.  Each entry consists of a directory name.  The current direc‐
+          tory may be indicated implicitly by an empty directory name, or
+          explicitly by a single period.
+.SH Command Exit Status
+     Each command has an exit status that can influence the behaviour of other
+     shell commands.  The paradigm is that a command exits with zero for normal
+     or success, and non-zero for failure, error, or a false indication.  The
+     man page for each command should indicate the various exit codes and what
+     they mean.  Additionally, the builtin commands return exit codes, as does
+     an executed shell function.
 
-/**
- * _unsetenv - Remove an environment variable
- * @info: Structure containing potential arguments. Used to maintain
- * constant function prototype.
- * Return: 1 on delete, 0 otherwise
- *  @var: the string env var property
- */
-int _unsetenv(info_t *info, char *var)
-{
-	list_t *node = info->env;
-	size_t i = 0;
-	char *p;
+     If a command consists entirely of variable assignments then the exit status
+     of the command is that of the last command substitution if any, otherwise
+     0.
 
-	if (!node || !var)
-		return (0);
+.SH echo [-n] args...
+    Print the arguments on the standard output, separated by spaces.
+    Unless the -n option is present, a newline is output following the
+    arguments.
 
-	while (node)
-	{
-		p = starts_with(node->str, var);
-		if (p && *p == '=')
-		{
-			info->env_changed = delete_node_at_index(&(info->env), i);
-			i = 0;
-			node = info->env;
-			continue;
-		}
-		node = node->next;
-		i++;
-	}
-	return (info->env_changed);
-}
+.SH exit [exitstatus]
+    Terminate the shell process.  If exitstatus is given it is used as
+    the exit status of the shell; otherwise the exit status of the pre‐
+    ceding command is used.
 
-/**
- * _setenv - Initialize a new environment variable,
- * or modify an existing one
- * @info: Structure containing potential arguments. Used to maintain
- *  constant function prototype.
- *  @var: the string env var property
- *  @value: the string env var value
- *  Return: Always 0
- */
-int _setenv(info_t *info, char *var, char *value)
-{
-	char *buf = NULL;
-	list_t *node;
-	char *p;
+.SH  pwd [-LP]
+    builtin command remembers what the current directory is rather than
+    recomputing it each time.  This makes it faster.  However, if the
+    current directory is renamed, the builtin version of pwd will con‐
+    tinue to print the old name for the directory.  The -P option causes
+    the physical value of the current working directory to be shown,
+    that is, all symbolic links are resolved to their respective values.
+    The -L option turns off the effect of any preceding -P options.
 
-	if (!var || !value)
-		return (0);
 
-	buf = malloc(_strlen(var) + _strlen(value) + 2);
-	if (!buf)
-		return (1);
-	_strcpy(buf, var);
-	_strcat(buf, "=");
-	_strcat(buf, value);
-	node = info->env;
-	while (node)
-	{
-		p = starts_with(node->str, var);
-		if (p && *p == '=')
-		{
-			free(node->str);
-			node->str = buf;
-			info->env_changed = 1;
-			return (0);
-		}
-		node = node->next;
-	}
-	add_node_end(&(info->env), buf, 0);
-	free(buf);
-	info->env_changed = 1;
-	return (0);
-}
+.SH AUTHOR
+Written by Osagie Cynthia and Okoro Kalu
